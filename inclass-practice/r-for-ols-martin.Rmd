@@ -14,7 +14,7 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE, eval=F)
+knitr::opts_chunk$set(echo = TRUE, eval=T)
 ```
 
 # 參考資料
@@ -80,17 +80,57 @@ summary(journals)
 > 期刊的價格(citeprice，平均文獻引用價格)如何影響其圖書館訂閱量(subs)? 
 
 ```{r ols-paircorr-r, echo=TRUE}
+library(psych)
+journals %>% 
+  select(citeprice,subs) %>%
+  pairs.panels()
+```
 
+```{r}
+# traditional usage
+select(journals,citeprice,subs) -> tempDF
+pairs.panels(tempDF)
+```
+
+```{r}
+# pipe expression
+journals %>% 
+  select(citeprice,subs) ->
+  tempDF
+tempDF %>%
+  pairs.panels()
+```
+
+```{r}
+journals %>% 
+  select(citeprice,subs) %>%
+  pairs.panels()
 ```
 
 
 ```{r ols-paircorr2-r}
-
+journals %>% 
+  select(citeprice,subs) %>%
+  mutate_all(log) %>%
+  pairs.panels()
 ```
 
 > 為什麼取log後，兩者的相關度變高？它表示兩個變數變得更不獨立嗎？
 
 # 效應評估
+
+當解釋變數並非直接代表有沒有受試的dummy variable(即只有0或1可能值)時，可以用以下的間斷例子來思考迴歸模型的係數含意：
+
+假設$P_i$就只有高價（$P_H$）及低價（$P_L$）兩種，$Y_{Hi},Y_{Li}$分別代表期刊$i$在在高價及低價的訂閱量，我們觀察到的訂量$Y_i$只會是$Y_{Hi},Y_{Li}$其中一個。我們可以將$Y_i$與$P_i$寫成如下的效應關係：
+
+$$Y_i=Y_{Li}+\frac{Y_{Hi}-Y_{Li}}{P_H-P_L}(P_i-P_L)$$
+
+
+若假設價格對每個期刊帶來的單位變化固定，即：
+$$\frac{Y_{Hi}-Y_{Li}}{P_H-P_L}=\beta_1^*$$
+
+則
+$$Y_i=Y_{Li}+\beta_1^*(P_i-P_L)$$
 
 > 單純比較不同「期刊價格」(citeprice)的期刊所獨得的圖書館「訂閱數」(subs)變化並無法反應真正的「期刊價格」效應，原因是「立足點」並不與「期刊價格」獨立。
 
@@ -114,8 +154,32 @@ summary(journals)
 
 ```{r}
 
+```
+
+## broom 
+
+  * tidy()
+  
+  * augment()
+  
+  * glance()
+
+```{r}
 
 ```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
 
 ## 模型比較
 
